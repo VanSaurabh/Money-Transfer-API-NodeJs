@@ -91,3 +91,7 @@ exports.deleteTransferDetails = (request, response) => {
         response.status(400).send({message:"Invalid input !!"});
     }
 };
+
+exports.getAppDetails = (request, response) => {
+    response.status(200).send(`<h1>Welcome to money transfer API</h1>`);
+}
