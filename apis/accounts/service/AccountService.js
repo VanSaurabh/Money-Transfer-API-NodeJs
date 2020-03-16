@@ -10,7 +10,7 @@ exports.addAccount = (request, response) => {
                 currencyCode: request.body.currencyCode
             });
             account.save().then(data => {
-                response.status(200).send(data);
+                response.status(201).send(data);
             }).catch(error => {
                 response.status(500).send({message: error.message || "Some internal error occurred !!"});
             });
@@ -81,7 +81,7 @@ exports.deleteAccount = (request, response) => {
             if(!account){
                 response.status(404).send({message: "Account not found with id " + request.params.id + " !!"});
             }
-            response.status(200).send({message: "Account deleted successfully !!"});
+            response.status(204).send({message: "Account deleted successfully !!"});
         }).catch(error => {
             response.status(500).send({message: error.message || "Some internal error occurred !!"});
         });

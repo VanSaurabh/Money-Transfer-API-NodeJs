@@ -11,7 +11,7 @@ exports.addTransferDetails = (request, response) => {
                 currencyCode: request.body.currencyCode
             });
             transfer.save().then(data => {
-                response.status(200).send(data);
+                response.status(201).send(data);
             }).catch(error => {
                 response.status(500).send({message: error.message || "Some internal error occurred !!"});
             });
@@ -83,7 +83,7 @@ exports.deleteTransferDetails = (request, response) => {
             if(!transfer){
                 response.status(404).send({message: "Transfer details not found with id " + request.params.id + " !!"});
             }
-            response.status(200).send({message: "Transfer details deleted successfully !!"});
+            response.status(204).send({message: "Transfer details deleted successfully !!"});
         }).catch(error => {
             response.status(500).send({message: error.message || "Some internal error occurred !!"});
         });
