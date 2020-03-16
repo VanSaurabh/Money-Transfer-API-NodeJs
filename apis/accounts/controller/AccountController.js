@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
-//app.get('/', accountService.getAppDetails);
+app.get('/', accountService.getAppDetails);
 
 app.get('/accounts', accountService.getAllAccounts);
 
