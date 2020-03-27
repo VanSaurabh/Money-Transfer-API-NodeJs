@@ -4,7 +4,7 @@ const transferSchema = mongoose.Schema({
     depositAccountNumber : Number,
     withdrawAccountNumber : Number,
     accountType: String,
-    balance: Number,
+    transactionBalance: Number,
     currencyCode: String
 });
 

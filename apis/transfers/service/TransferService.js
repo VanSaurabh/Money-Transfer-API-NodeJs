@@ -104,36 +104,37 @@ exports.processTransfer = (request, response) => {
             depositAccountNumber : request.body.depositAccountNumber,
             withdrawAccountNumber : request.body.withdrawAccountNumber,
             accountType: request.body.accountType,
-            balance: request.body.balance,
+            transactionBalance: request.body.transactionBalance,
             currencyCode: request.body.currencyCode
         });
-        console.log(transfer.depositAccountNumber+" " +transfer.withdrawAccountNumber+" "+transfer.balance);
+        console.log(transfer.depositAccountNumber+" " +transfer.withdrawAccountNumber+" "
+        +transfer.transactionBalance);
         var depositAccount;
         var withdrawAccount;
         Account.findOne({
             'accountNumber' : transfer.depositAccountNumber
-        }, function(err, account) {
-            if(err) throw err;
+        }).then(account => {
             depositAccount = account;
             console.log(depositAccount);
-            depositAccount.balance = depositAccount.balance + transfer.balance;
+            depositAccount.balance = depositAccount.balance + transfer.transactionBalance;
             depositAccount.save().then(data => {
                 response.status(200).send(data);
             }).catch(error => {
                 response.status(500).send({message: error.message || "Some internal error occurred !!"});
             });
-        });
+        }).catch(error => {
+            console.log(error);
+        })
 
         Account.findOne({
             'accountNumber' : transfer.withdrawAccountNumber
-        }, function(err, account) {
-            if(err) throw err;
+        }).then(account => {
             withdrawAccount = account;
             console.log(withdrawAccount);
-            if(null != transfer.balance && undefined != transfer.balance 
-                && transfer.balance > 0){
-                if(withdrawAccount.balance > transfer.balance) {
-                withdrawAccount.balance = withdrawAccount.balance - transfer.balance;
+            if(null != transfer.transactionBalance && undefined != transfer.transactionBalance 
+                && transfer.transactionBalance > 0){
+                if(withdrawAccount.balance > transfer.transactionBalance) {
+                withdrawAccount.balance = withdrawAccount.balance - transfer.transactionBalance;
                 }else{
                     response.status(400).send({message: "The account does not have sufficient balance"});
                 }
@@ -145,6 +146,8 @@ exports.processTransfer = (request, response) => {
             }).catch(error => {
                 response.status(500).send({message: error.message || "Some internal error occurred !!"});
             });
+        }).catch(error => {
+            console.log(error);
         });
     }else {
         response.status(400).send({message:"Invalid input !!"});
