@@ -1,4 +1,5 @@
 const Transfer = require('../model/Transfer.js');
+const Account = require('../../accounts/model/Account.js');
 
 exports.addTransferDetails = (request, response) => {
     if(request != undefined && null != request){
@@ -94,4 +95,58 @@ exports.deleteTransferDetails = (request, response) => {
 
 exports.getAppDetails = (request, response) => {
     response.status(200).send(`<h1>Welcome to money transfer API</h1>`);
-}
+};
+
+exports.processTransfer = (request, response) => {
+    if(request != undefined && null != request && request.params != undefined && null != request.params){
+
+        const transfer = new Transfer({
+            depositAccountNumber : request.body.depositAccountNumber,
+            withdrawAccountNumber : request.body.withdrawAccountNumber,
+            accountType: request.body.accountType,
+            balance: request.body.balance,
+            currencyCode: request.body.currencyCode
+        });
+        console.log(transfer.depositAccountNumber+" " +transfer.withdrawAccountNumber+" "+transfer.balance);
+        var depositAccount;
+        var withdrawAccount;
+        Account.findOne({
+            'accountNumber' : transfer.depositAccountNumber
+        }, function(err, account) {
+            if(err) throw err;
+            depositAccount = account;
+            console.log(depositAccount);
+            depositAccount.balance = depositAccount.balance + transfer.balance;
+            depositAccount.save().then(data => {
+                response.status(200).send(data);
+            }).catch(error => {
+                response.status(500).send({message: error.message || "Some internal error occurred !!"});
+            });
+        });
+
+        Account.findOne({
+            'accountNumber' : transfer.withdrawAccountNumber
+        }, function(err, account) {
+            if(err) throw err;
+            withdrawAccount = account;
+            console.log(withdrawAccount);
+            if(null != transfer.balance && undefined != transfer.balance 
+                && transfer.balance > 0){
+                if(withdrawAccount.balance > transfer.balance) {
+                withdrawAccount.balance = withdrawAccount.balance - transfer.balance;
+                }else{
+                    response.status(400).send({message: "The account does not have sufficient balance"});
+                }
+            }else {
+                response.status(400).send({message: "Invalid input !!"});
+            }
+            withdrawAccount.save().then(data => {
+                response.status(200).send(data);
+            }).catch(error => {
+                response.status(500).send({message: error.message || "Some internal error occurred !!"});
+            });
+        });
+    }else {
+        response.status(400).send({message:"Invalid input !!"});
+    }
+};

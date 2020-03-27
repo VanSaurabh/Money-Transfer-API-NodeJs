@@ -2,7 +2,7 @@ const express = require('express');
 const transferService = require('../service/TransferService.js');
 const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
+const port = 3001;
 const dbConfig = require('../../config/DatabaseConfig.js');
 
 
@@ -24,3 +24,6 @@ app.post('/transfers', transferService.addTransferDetails);
 app.put('/transfers/:id', transferService.updateTransferDetails);
 
 app.delete('/transfers/:id', transferService.deleteTransferDetails);
+
+//Transfer APIs
+app.post('/transfers/balance', transferService.processTransfer);
